@@ -1,24 +1,46 @@
 class Java::ComGoogleGdataClient::GoogleService
-  include_class 'java.net.URL'
-  alias_method :orig_get_feed, :get_feed
-  alias_method :orig_insert, :insert
+  include GoogleHelpers
   
   def oauth_credentials=(credientials, signer=GData::OAuthHmacSha1Signer.new)
     self.set_oauth_credentials(credientials, signer)
   end
   
-  def get_feed(url, feed_java_class)
-    url = (url.kind_of? String) ? URL.new(url) : url
-    self.orig_get_feed(url, feed_java_class)
+  def find_feed(options={})
+    raise "URL or query is required" unless options[:url] or option[:query]
+    raise "Feed Class is required" unless options[:class]
+    options[:url] = url_for(options[:url]) if options[:url]
+    
+    if options[:etag] or options[:modified_since]
+      get_feed(options[:url] || options[:query], 
+        options[:class].java_class, 
+        options[:etag] || options[:modified_since])
+    else
+      get_feed(options[:url] || options[:query], 
+        options[:class].java_class)
+    end
   end
   
-  def get_feed_with_url(url, feed_java_class)
-    self.orig_get_feed(URL.new(url), feed_java_class)
+  def find_entry(options={})
+    raise "URL or query is required" unless options[:url] or option[:query]
+    raise "Entry Class is required" unless options[:class]
+    options[:url] = url_for(options[:url]) if options[:url]
+    
+    if options[:etag] or options[:modified_since]
+      get_entry(options[:url] || options[:query], 
+        options[:class].java_class, 
+        options[:etag] || options[:modified_since])
+    else
+      get_entry(options[:url] || options[:query], 
+        options[:class].java_class)
+    end
   end
   
-  def insert(url, entry)
-    url = (url.kind_of? String) ? URL.new(url) : url
-    self.orig_insert(url, entry)
+  def create(options={})
+    raise "Feed URL is required" unless options[:url]
+    raise "Entry is required" unless options[:entry]
+    options[:url] = url_for(options[:url]) if options[:url]
+    
+    insert(options[:url], options[:entry])
   end
   
 end

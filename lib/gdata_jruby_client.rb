@@ -18,6 +18,7 @@ module GData
   include_package 'com.google.gdata.client.authn.oauth'
 end
 
+require File.dirname(__FILE__) + '/google_helpers'
 require File.dirname(__FILE__) + '/base_entry'
 require File.dirname(__FILE__) + '/google_oauth_parameters'
 require File.dirname(__FILE__) + '/google_service'
