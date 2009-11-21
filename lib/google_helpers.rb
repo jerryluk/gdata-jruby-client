@@ -5,5 +5,4 @@ module GoogleHelpers
     (url_or_string.kind_of? String) ? URL.new(url_or_string) : url_or_string
   end
   
-  
 end

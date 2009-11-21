@@ -35,7 +35,7 @@ class Java::ComGoogleGdataClient::GoogleService
     end
   end
   
-  def create(options={})
+  def create_entry(options={})
     raise "Feed URL is required" unless options[:url]
     raise "Entry is required" unless options[:entry]
     options[:url] = url_for(options[:url]) if options[:url]
