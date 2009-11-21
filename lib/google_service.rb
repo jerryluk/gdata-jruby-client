@@ -6,7 +6,7 @@ class Java::ComGoogleGdataClient::GoogleService
   end
   
   def find_feed(options={})
-    raise "URL or query is required" unless options[:url] or option[:query]
+    raise "URL or query is required" unless options[:url] or options[:query]
     raise "Feed Class is required" unless options[:class]
     options[:url] = url_for(options[:url]) if options[:url]
     

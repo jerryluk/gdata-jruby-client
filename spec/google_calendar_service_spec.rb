@@ -30,38 +30,38 @@ describe GData::CalendarService do
     end
   end
   
-  it "should be able to create, update and delete new calendars" do   
-    # Create a new calendar
-    calendar = GData::CalendarEntry.new
-    calendar.title = "New Calendar".to_gdata
-    calendar.summary = "This is a new Calendar.".to_gdata
-    calendar.time_zone = GData::TimeZoneProperty.new('America/Los_Angeles')
-    calendar.hidden = GData::HiddenProperty::FALSE
-    calendar.color = GData::ColorProperty.new('#2952A3')
-    calendar.add_location GData::Where.new("", "", "Palo Alto")
-    
-    calendar = @service.create_entry(:url => GData::CalendarService::OWN_CALENDAR_URL, 
-      :entry => calendar)
-    calendar.should_not be_nil
-    calendar.id.should_not be_nil
-    calendar.title.plain_text.should == "New Calendar"
-    
-    #Update a new calendar
-    calendar.title = "New Title".to_gdata
-    calendar = calendar.update 
-    calendar.title.plain_text.should == "New Title"
-    
-    # Delete the calendar
-    lambda do
-      calendar.delete
-    end.should_not raise_error
-    
-    feed = @service.find_feed(:url => GData::CalendarService::OWN_CALENDAR_URL)
-    entries = feed.entries
-    entries.each do |e|
-      e.id.should_not == calendar.id
-    end
-  end
+  # it "should be able to create, update and delete new calendars" do   
+  #   # Create a new calendar
+  #   calendar = GData::CalendarEntry.new
+  #   calendar.title = "New Calendar".to_gdata
+  #   calendar.summary = "This is a new Calendar.".to_gdata
+  #   calendar.time_zone = GData::TimeZoneProperty.new('America/Los_Angeles')
+  #   calendar.hidden = GData::HiddenProperty::FALSE
+  #   calendar.color = GData::ColorProperty.new('#2952A3')
+  #   calendar.add_location GData::Where.new("", "", "Palo Alto")
+  #   
+  #   calendar = @service.create_entry(:url => GData::CalendarService::OWN_CALENDAR_URL, 
+  #     :entry => calendar)
+  #   calendar.should_not be_nil
+  #   calendar.id.should_not be_nil
+  #   calendar.title.plain_text.should == "New Calendar"
+  #   
+  #   #Update a new calendar
+  #   calendar.title = "New Title".to_gdata
+  #   calendar = calendar.update 
+  #   calendar.title.plain_text.should == "New Title"
+  #   
+  #   # Delete the calendar
+  #   lambda do
+  #     calendar.delete
+  #   end.should_not raise_error
+  #   
+  #   feed = @service.find_feed(:url => GData::CalendarService::OWN_CALENDAR_URL)
+  #   entries = feed.entries
+  #   entries.each do |e|
+  #     e.id.should_not == calendar.id
+  #   end
+  # end
   
   it "should be able to create, update, and delete events" do
     event = GData::CalendarEventEntry.new
@@ -126,7 +126,7 @@ describe GData::CalendarService do
     end
     
     after(:all) do
-      @event.delete
+      sleep(3)
       @calendar.delete
     end
     
@@ -142,6 +142,25 @@ describe GData::CalendarService do
       query = GData::CalendarQuery.new(url_for(@calendar_url))
       query.minimum_start_time = Time.local(2010, "dec", 25, 0, 0, 0).to_gdata
       query.maximum_start_time = Time.local(2010, "dec", 26, 0, 0, 0).to_gdata
+      
+      feed = @service.find_feed(:query => query)
+      feed.should_not be_nil
+      entries = feed.entries
+      entries.size.should == 1
+      entries.first.id.should == @event.id
+      
+      query = GData::CalendarQuery.new(url_for(@calendar_url))
+      query.minimum_start_time = Time.local(2010, "dec", 20, 0, 0, 0).to_gdata
+      query.maximum_start_time = Time.local(2010, "dec", 21, 0, 0, 0).to_gdata
+      
+      feed = @service.find_feed(:query => query)
+      feed.should_not be_nil
+      feed.entries.size.should == 0
+    end
+    
+    it "should retrieve events matching a full text query" do
+      query = GData::CalendarQuery.new(url_for(@calendar_url))
+      query.full_text_query = "Test Event"
       
       feed = @service.find_feed(:query => query)
       feed.should_not be_nil
