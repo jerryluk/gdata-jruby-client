@@ -4,18 +4,18 @@ class Time
   include_class('com.google.gdata.data.DateTime') {|package,name| "G#{name}" }
   
   def to_gdata
-    to_gdata_date_time
+    to_date_time
   end
   
-  def to_gdata_date_time
+  def to_date_time
     GDateTime.parseDateTime(self.iso8601)
   end
   
   def self.from_gdata(gdatetime)
-    self.from_gdata_date_time(gdatetime)
+    self.from_date_time(gdatetime)
   end
   
-  def self.from_gdata_date_time(gdatetime)
+  def self.from_date_time(gdatetime)
     if defined? parse
       self.parse(gdatetime.to_s)
     else
