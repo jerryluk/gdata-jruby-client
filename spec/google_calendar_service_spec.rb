@@ -30,40 +30,40 @@ describe GData::CalendarService do
     end
   end
   
-  # Commented out because running this test case too many times will cause Google to stop you
-  # from using the API
-  # it "should be able to create, update and delete new calendars" do   
-  #   # Create a new calendar
-  #   calendar = GData::CalendarEntry.new(
-  #     :title => "New Calendar".to_plain_text,
-  #     :summary => "This is a new Calendar.".to_plain_text,
-  #     :time_zone => GData::TimeZoneProperty.new('America/Los_Angeles'),
-  #     :hidden => GData::HiddenProperty::FALSE,
-  #     :color => GData::ColorProperty.new('#2952A3'))
-  #   calendar.add_location GData::Where.new("", "", "Palo Alto")
-  #   
-  #   calendar = @service.create_entry(:url => GData::CalendarService::OWN_CALENDAR_URL, 
-  #     :entry => calendar)
-  #   calendar.should_not be_nil
-  #   calendar.id.should_not be_nil
-  #   calendar.title.plain_text.should == "New Calendar"
-  #   
-  #   #Update a new calendar
-  #   calendar.title = "New Title".to_gdata
-  #   calendar = calendar.update 
-  #   calendar.title.plain_text.should == "New Title"
-  #   
-  #   # Delete the calendar
-  #   lambda do
-  #     calendar.delete
-  #   end.should_not raise_error
-  #   
-  #   feed = @service.find_feed(:url => GData::CalendarService::OWN_CALENDAR_URL)
-  #   entries = feed.entries
-  #   entries.each do |e|
-  #     e.id.should_not == calendar.id
-  #   end
-  # end
+  # Commented out if you run this test case too many times which will hit
+  # the API throttle limit
+  it "should be able to create, update and delete new calendars" do   
+    # Create a new calendar
+    calendar = GData::CalendarEntry.new(
+      :title => "New Calendar".to_plain_text,
+      :summary => "This is a new Calendar.".to_plain_text,
+      :time_zone => GData::TimeZoneProperty.new('America/Los_Angeles'),
+      :hidden => GData::HiddenProperty::FALSE,
+      :color => GData::ColorProperty.new('#2952A3'))
+    calendar.add_location GData::Where.new("", "", "Palo Alto")
+    
+    calendar = @service.create_entry(:url => GData::CalendarService::OWN_CALENDAR_URL, 
+      :entry => calendar)
+    calendar.should_not be_nil
+    calendar.id.should_not be_nil
+    calendar.title.plain_text.should == "New Calendar"
+    
+    #Update a new calendar
+    calendar.title = "New Title".to_gdata
+    calendar = calendar.update 
+    calendar.title.plain_text.should == "New Title"
+    
+    # Delete the calendar
+    lambda do
+      calendar.delete
+    end.should_not raise_error
+    
+    feed = @service.find_feed(:url => GData::CalendarService::OWN_CALENDAR_URL)
+    entries = feed.entries
+    entries.each do |e|
+      e.id.should_not == calendar.id
+    end
+  end
   
   it "should be able to create, update, and delete events" do
     event = GData::CalendarEventEntry.new(
@@ -123,7 +123,59 @@ describe GData::CalendarService do
     end.should_not raise_error
   end
   
-  it "should be able to perform multiple operations with a batch request"
+  # Copied from Google: When working with batch requests, the size of the request must be 
+  # under a megabyte and it's best to limit batches to 50-100 operations at a time.
+  it "should be able to perform multiple operations with a batch request" do
+    # Create a test calendar so this test case won't have dependency on the test account
+    calendar = GData::CalendarEntry.new(:title => "Test Calendar".to_plain_text)
+    calendar = @service.create_entry(:url => GData::CalendarService::OWN_CALENDAR_URL, 
+      :entry => calendar)
+    calendar_url = calendar.get_link(nil, nil).href
+    
+    # Create some events
+    1.upto 3 do |i|
+      event = GData::CalendarEventEntry.new(:title => "Test Event #{i}".to_plain_text)
+      event = @service.create_entry(:url => calendar_url, :entry => event)
+    end
+    
+    # Get some events to operate on
+    feed = @service.find_feed(:url => calendar_url)
+    
+    insert_event = GData::CalendarEventEntry.new(:title => 'first batch event'.to_plain_text)
+    GData::BatchUtils.set_batch_id(insert_event, "1")
+    GData::BatchUtils.set_batch_operation_type(insert_event, GData::BatchOperationType::INSERT)
+    
+    query_event = feed.entries[0]
+    GData::BatchUtils.set_batch_id(query_event, "2")
+    GData::BatchUtils.set_batch_operation_type(query_event, GData::BatchOperationType::QUERY)
+    
+    update_event = feed.entries[1]
+    update_event.title = 'update via batch'.to_plain_text
+    GData::BatchUtils.set_batch_id(update_event, "3")
+    GData::BatchUtils.set_batch_operation_type(update_event, GData::BatchOperationType::UPDATE)
+    
+    delete_event = feed.entries[2]
+    GData::BatchUtils.set_batch_id(delete_event, "4")
+    GData::BatchUtils.set_batch_operation_type(delete_event, GData::BatchOperationType::DELETE)
+    
+    batch_request = GData::CalendarEventFeed.new
+    batch_request.entries << insert_event
+    batch_request.entries << query_event
+    batch_request.entries << update_event
+    batch_request.entries << delete_event
+    
+    # Get the batch link URL and send the batch request there
+    batch_url = feed.get_link(GData::Link::Rel::FEED_BATCH, GData::Link::Type::ATOM).href
+    batch_response = @service.create_batch(:url => batch_url, :feed => batch_request)
+    
+    batch_response.entries.each do |entry|
+      GData::BatchUtils.success?(entry).should == true
+    end
+    
+    # Clean up
+    sleep(3)
+    calendar.delete
+  end
   
   it "should be able to add extented properties to the event" do
     event = GData::CalendarEventEntry.new(

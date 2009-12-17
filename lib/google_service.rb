@@ -43,4 +43,12 @@ class Java::ComGoogleGdataClient::GoogleService
     insert(options[:url], options[:entry])
   end
   
+  def create_batch(options={})
+    raise "Feed URL is required" unless options[:url]
+    raise "Feed is required" unless options[:feed]
+    options[:url] = url_for(options[:url]) if options[:url]
+    
+    batch(options[:url], options[:feed])
+  end
+  
 end

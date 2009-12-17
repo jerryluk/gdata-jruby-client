@@ -10,8 +10,8 @@ module GData
   include_package 'com.google.gdata.data'
   include_package 'com.google.gdata.data.acl'
   include_package 'com.google.gdata.data.extensions'
+  include_package 'com.google.gdata.data.batch'
   include_package 'com.google.gdata.util'
   include_package 'com.google.gdata.client'
   include_package 'com.google.gdata.client.authn.oauth'
-  
 end
