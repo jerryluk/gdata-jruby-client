@@ -105,11 +105,51 @@ describe GData::CalendarService do
     end.should_not raise_error
   end
   
-  it "should be able to create recurring events"
+  it "should be able to create recurring events" do
+    recur_data = "DTSTART;VALUE=DATE:20070501\n" + 
+                 "DTEND;VALUE=DATE:20070502\n" + 
+                 "RRULE:FREQ=WEEKLY;BYDAY=Tu;UNTIL=20070904"
+    recur = GData::Recurrence.new(recur_data)
+    event = GData::CalendarEventEntry.new(:recurrence => recur)
+    
+    event = @service.create_entry(:url => GData::CalendarService::DEFAULT_CALENDAR_URI, 
+      :entry => event)
+    
+    event.id.should_not be_nil
+    event.recurrence.value.should == recur_data
+    
+    lambda do
+      event.delete
+    end.should_not raise_error
+  end
   
   it "should be able to perform multiple operations with a batch request"
   
-  it "should be able to add extented properties to the event"
+  it "should be able to add extented properties to the event" do
+    event = GData::CalendarEventEntry.new(
+      :title => 'New Event'.to_plain_text,
+      :content => 'New Content'.to_plain_text)
+    event_time = GData::When.new(
+      :start_time => Time.local(2010, "dec", 25, 20, 0, 0),
+      :end_time => Time.local(2010, "dec", 25, 21, 0, 0))
+    event.add_time(event_time)
+    
+    property = GData::ExtendedProperty.new(
+      :name => 'http://schemas.presdo.com/2009#event.id',
+      :value => '1234')
+    event.add_extended_property(property)
+    
+    event = @service.create_entry(:url => GData::CalendarService::DEFAULT_CALENDAR_URI, 
+      :entry => event)
+    event.id.should_not be_nil
+    
+    event.extended_properties.first.name.should == 'http://schemas.presdo.com/2009#event.id'
+    event.extended_properties.first.value.should == '1234'
+    
+    lambda do
+      event.delete
+    end.should_not raise_error
+  end
 
   describe "Retrieving events" do
     before(:all) do
@@ -124,7 +164,7 @@ describe GData::CalendarService do
       
       @event = GData::CalendarEventEntry.new(:title => 'Test Event'.to_plain_text)
       @event_time = GData::When.new(
-        :start_time => @Time.local(2010, "dec", 25, 20, 0, 0), 
+        :start_time => Time.local(2010, "dec", 25, 20, 0, 0), 
         :end_time => Time.local(2010, "dec", 25, 21, 0, 0))
       @event.add_time(@event_time)
       @event = @service.create_entry(:url => @calendar_url, :entry => @event)
