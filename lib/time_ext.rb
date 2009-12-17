@@ -3,26 +3,26 @@ require 'parsedate'
 class Time
   include_class('com.google.gdata.data.DateTime') {|package,name| "G#{name}" }
   
-  def to_gdata
-    to_date_time
-  end
-  
-  def to_date_time
+  def to_joda_time
     GDateTime.parseDateTime(self.iso8601)
   end
   
-  def self.from_gdata(gdatetime)
-    self.from_date_time(gdatetime)
-  end
+  alias_method :to_gdata, :to_joda_time
+  alias_method :to_date_time, :to_joda_time
   
-  def self.from_date_time(gdatetime)
-    if defined? parse
-      self.parse(gdatetime.to_s)
-    else
-      res = ParseDate.parsedate(gdatetime.to_s)
-      Time.local(*res)
+  class << self
+    def from_joda_time(gdatetime)
+      if defined? parse
+        self.parse(gdatetime.to_s)
+      else
+        res = ParseDate.parsedate(gdatetime.to_s)
+        Time.local(*res)
+      end
     end
-  end
+    
+    alias_method :from_gdata, :from_joda_time
+    alias_method :from_date_time, :from_joda_time
+  end  
   
   unless defined? iso8601
     # The following are copied from Rails. If you are using Rails, everything

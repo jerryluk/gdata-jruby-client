@@ -30,14 +30,16 @@ describe GData::CalendarService do
     end
   end
   
+  # Commented out because running this test case too many times will cause Google to stop you
+  # from using the API
   # it "should be able to create, update and delete new calendars" do   
   #   # Create a new calendar
-  #   calendar = GData::CalendarEntry.new
-  #   calendar.title = "New Calendar".to_gdata
-  #   calendar.summary = "This is a new Calendar.".to_gdata
-  #   calendar.time_zone = GData::TimeZoneProperty.new('America/Los_Angeles')
-  #   calendar.hidden = GData::HiddenProperty::FALSE
-  #   calendar.color = GData::ColorProperty.new('#2952A3')
+  #   calendar = GData::CalendarEntry.new(
+  #     :title => "New Calendar".to_plain_text,
+  #     :summary => "This is a new Calendar.".to_plain_text,
+  #     :time_zone => GData::TimeZoneProperty.new('America/Los_Angeles'),
+  #     :hidden => GData::HiddenProperty::FALSE,
+  #     :color => GData::ColorProperty.new('#2952A3'))
   #   calendar.add_location GData::Where.new("", "", "Palo Alto")
   #   
   #   calendar = @service.create_entry(:url => GData::CalendarService::OWN_CALENDAR_URL, 
@@ -64,18 +66,18 @@ describe GData::CalendarService do
   # end
   
   it "should be able to create, update, and delete events" do
-    event = GData::CalendarEventEntry.new
-    event.title = 'New Event'.to_gdata
-    event.content = 'New Content'.to_gdata
-    event_time = GData::When.new
-    event_time.start_time = Time.local(2010, "dec", 25, 20, 0, 0).to_gdata
-    event_time.end_time = Time.local(2010, "dec", 25, 21, 0, 0).to_gdata
+    event = GData::CalendarEventEntry.new(
+      :title => 'New Event'.to_plain_text,
+      :content => 'New Content'.to_plain_text)
+    event_time = GData::When.new(
+      :start_time => Time.local(2010, "dec", 25, 20, 0, 0),
+      :end_time => Time.local(2010, "dec", 25, 21, 0, 0))
     event.add_time(event_time)
     event = @service.create_entry(:url => GData::CalendarService::DEFAULT_CALENDAR_URI, 
       :entry => event)
     event.id.should_not be_nil
     
-    event.title = 'New Title'.to_gdata
+    event.title = 'New Title'.to_plain_text
     event = event.update
     event.title.plain_text.should == 'New Title'
     
@@ -85,9 +87,9 @@ describe GData::CalendarService do
   end
   
   it "should able to quick add an event" do
-    event = GData::CalendarEventEntry.new
-    event.content = "Say Hi to Jerry Oct 31, 2010 12pm-1pm".to_gdata
-    event.quick_add = true
+    event = GData::CalendarEventEntry.new(
+      :content => "Say Hi to Jerry Oct 31, 2010 12pm-1pm".to_plain_text,
+      :quick_add => true)
     
     event = @service.create_entry(:url => GData::CalendarService::DEFAULT_CALENDAR_URI, 
       :entry => event)
@@ -95,32 +97,35 @@ describe GData::CalendarService do
     event.id.should_not be_nil
     
     event.title.plain_text.should == "Say Hi to Jerry"
-    start_time = Time.from_gdata(event.times.first.start_time)
+    start_time = Time.from_joda_time(event.times.first.start_time)
     start_time.should == Time.local(2010, 10, 31, 12, 0, 0, "-07:00", nil)
     
     lambda do
       event.delete
     end.should_not raise_error
   end
+  
+  it "should be able to create recurring events"
+  
+  it "should be able to perform multiple operations with a batch request"
+  
+  it "should be able to add extented properties to the event"
 
   describe "Retrieving events" do
     before(:all) do
       create_service
       
-      @calendar = GData::CalendarEntry.new
-      @calendar.title = "Test Calendar".to_gdata
-      @calendar.time_zone = GData::TimeZoneProperty.new('America/Los_Angeles')
+      @calendar = GData::CalendarEntry.new(
+        :title => "Test Calendar".to_plain_text,
+        :time_zone => GData::TimeZoneProperty.new('America/Los_Angeles'))
       @calendar = @service.create_entry(:url => GData::CalendarService::OWN_CALENDAR_URL, 
         :entry => @calendar)
       @calendar_url = @calendar.get_link(nil, nil).href
       
-      @event = GData::CalendarEventEntry.new
-      @event.title = 'Test Event'.to_gdata
-      @event_time = GData::When.new
-      @start_time = Time.local(2010, "dec", 25, 20, 0, 0)
-      @end_time = Time.local(2010, "dec", 25, 21, 0, 0)
-      @event_time.start_time = @start_time.to_gdata
-      @event_time.end_time = @end_time.to_gdata
+      @event = GData::CalendarEventEntry.new(:title => 'Test Event'.to_plain_text)
+      @event_time = GData::When.new(
+        :start_time => @Time.local(2010, "dec", 25, 20, 0, 0), 
+        :end_time => Time.local(2010, "dec", 25, 21, 0, 0))
       @event.add_time(@event_time)
       @event = @service.create_entry(:url => @calendar_url, :entry => @event)
     end
@@ -139,9 +144,10 @@ describe GData::CalendarService do
     end
     
     it "should retrieve events for a specified date range" do
-      query = GData::CalendarQuery.new(url_for(@calendar_url))
-      query.minimum_start_time = Time.local(2010, "dec", 25, 0, 0, 0).to_gdata
-      query.maximum_start_time = Time.local(2010, "dec", 26, 0, 0, 0).to_gdata
+      query = GData::CalendarQuery.new(
+        :url => @calendar_url,
+        :minimum_start_time => Time.local(2010, "dec", 25, 0, 0, 0),
+        :maximum_start_time => Time.local(2010, "dec", 26, 0, 0, 0))
       
       feed = @service.find_feed(:query => query)
       feed.should_not be_nil
@@ -149,9 +155,9 @@ describe GData::CalendarService do
       entries.size.should == 1
       entries.first.id.should == @event.id
       
-      query = GData::CalendarQuery.new(url_for(@calendar_url))
-      query.minimum_start_time = Time.local(2010, "dec", 20, 0, 0, 0).to_gdata
-      query.maximum_start_time = Time.local(2010, "dec", 21, 0, 0, 0).to_gdata
+      query = GData::CalendarQuery.new(@calendar_url)
+      query.minimum_start_time = Time.local(2010, "dec", 20, 0, 0, 0).to_joda_time
+      query.maximum_start_time = Time.local(2010, "dec", 21, 0, 0, 0).to_joda_time
       
       feed = @service.find_feed(:query => query)
       feed.should_not be_nil
@@ -159,8 +165,9 @@ describe GData::CalendarService do
     end
     
     it "should retrieve events matching a full text query" do
-      query = GData::CalendarQuery.new(url_for(@calendar_url))
-      query.full_text_query = "Test Event"
+      query = GData::CalendarQuery.new(
+        :url => @calendar_url,
+        :full_text_query => "Test Event")
       
       feed = @service.find_feed(:query => query)
       feed.should_not be_nil

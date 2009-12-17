@@ -1,4 +1,4 @@
-class Java::ComGoogleGdataData::BaseEntry
+class Java::ComGoogleGdataDataExtensions::When
   include GoogleHelpers
   
   alias_method :orig_initialize, :initialize
@@ -12,9 +12,5 @@ class Java::ComGoogleGdataData::BaseEntry
     else
       orig_initialize
     end
-  end
-  
-  def id
-    get_id
   end
 end
