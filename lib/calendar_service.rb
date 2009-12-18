@@ -1,6 +1,7 @@
 module GData
   include_package 'com.google.gdata.data.calendar'
   include_package 'com.google.gdata.client.calendar'
+  include_package 'com.google.gdata.data.extensions'
 end
 
 class Java::ComGoogleGdataClientCalendar::CalendarService

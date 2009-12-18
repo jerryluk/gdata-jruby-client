@@ -169,6 +169,11 @@ describe GData::CalendarService do
     batch_response = @service.create_batch(:url => batch_url, :feed => batch_request)
     
     batch_response.entries.each do |entry|
+      unless GData::BatchUtils.success?(entry)
+        batch_id = GData::BatchUtils.getBatchId(entry)
+        status = GData::BatchUtils.getBatchStatus(entry)
+        puts "#{batch_id} failed (#{status.reason}) #{status.content}"
+      end
       GData::BatchUtils.success?(entry).should == true
     end
     
