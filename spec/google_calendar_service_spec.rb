@@ -138,6 +138,9 @@ describe GData::CalendarService do
       event = @service.create_entry(:url => calendar_url, :entry => event)
     end
     
+    # Give it a small delay such that the changes is propagated
+    sleep(2)
+    
     # Get some events to operate on
     feed = @service.find_feed(:url => calendar_url)
     
