@@ -5,6 +5,10 @@ class Java::ComGoogleGdataClient::GoogleService
     self.set_oauth_credentials(credientials, signer)
   end
   
+  def auth_sub_token=(token, private_key=nil)
+    self.set_auth_sub_token(token, private_key)
+  end
+  
   def find_feed(options={})
     raise "URL or query is required" unless options[:url] or options[:query]
     raise "Feed Class is required" unless options[:class]
