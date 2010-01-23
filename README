@@ -1,5 +1,8 @@
 GData JRuby Client
 =====================
-gdata-jruby-client allows you to use GData Client from JRuby using the official Java GData client from Google 
+The GData JRuby Client allows you to easily access data through Google Data APIs. It uses the GData Java Client Library from Google.
+
 See more at http://code.google.com/apis/gdata/docs/client-libraries.html
 The jar files are based on gdata-java-client v1.40.0
+
+GData JRuby Client is under the terms of MIT License and GData Java Client Library is under the terms of Apache License 2.0.
