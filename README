@@ -5,4 +5,21 @@ The GData JRuby Client allows you to easily access data through Google Data APIs
 See more at http://code.google.com/apis/gdata/docs/client-libraries.html
 The jar files are based on gdata-java-client v1.40.0
 
-GData JRuby Client is under the terms of MIT License and GData Java Client Library is under the terms of Apache License 2.0.
+GData JRuby Client is released under MIT License and GData Java Client Library is released under the Apache License 2.0.
+
+Running the test cases
+========================
+To run the test case, please create 'google_key.rb' and put it inside the 'spec' folder with something similar to the following:
+
+# Use OAuth
+CONSUMER_KEY = "yourdomain.com"
+CONSUMER_SECRET = "consumer_secret_from_google"
+TOKEN = "oauth_access_token"
+TOKEN_SECRET = "oauth_access_token_secret"
+
+# Use AuthSubToken
+SESSION_TOKEN = "auth_sub_token"
+
+Usage
+=======
+TBD
