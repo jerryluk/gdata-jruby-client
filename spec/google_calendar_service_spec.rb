@@ -281,15 +281,15 @@ describe GData::CalendarService do
   def create_service
     @service = GData::CalendarService.new DEFAULT_APPLICATION_NAME
     # Use OAuth
-    credentials = GData::GoogleOAuthParameters.new
-    credentials.attributes = {
-      :consumer_key => CONSUMER_KEY,
-      :consumer_secret => CONSUMER_SECRET,
-      :token => TOKEN,
-      :token_secret => TOKEN_SECRET }
-    @service.oauth_credentials = credentials
+    # credentials = GData::GoogleOAuthParameters.new
+    # credentials.attributes = {
+    #   :consumer_key => CONSUMER_KEY,
+    #   :consumer_secret => CONSUMER_SECRET,
+    #   :token => TOKEN,
+    #   :token_secret => TOKEN_SECRET }
+    # @service.oauth_credentials = credentials
     # Use AuthSubToken
-    # @service.auth_sub_token = SESSION_TOKEN
+    @service.auth_sub_token = { :token => SESSION_TOKEN }
     @service
   end
   

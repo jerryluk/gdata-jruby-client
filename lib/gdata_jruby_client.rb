@@ -3,6 +3,7 @@ DEFAULT_APPLICATION_NAME = "Presdo-GDataJRubyClient-0.1"
 module GData end
 
 require 'java'
+require 'ActiveSupport'
 require File.dirname(__FILE__) + '/base'
 require File.dirname(__FILE__) + '/contacts_service'
 require File.dirname(__FILE__) + '/time_ext'
