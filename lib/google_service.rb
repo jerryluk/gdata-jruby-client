@@ -14,13 +14,18 @@ class Java::ComGoogleGdataClient::GoogleService
     raise "Feed Class is required" unless options[:class]
     options[:url] = url_for(options[:url]) if options[:url]
     
-    if options[:etag] or options[:modified_since]
-      get_feed(options[:url] || options[:query], 
-        options[:class].java_class, 
-        options[:etag] || options[:modified_since])
-    else
-      get_feed(options[:url] || options[:query], 
-        options[:class].java_class)
+    begin
+      if options[:etag] or options[:modified_since]
+        get_feed(options[:url] || options[:query], 
+          options[:class].java_class, 
+          options[:etag] || options[:modified_since])
+      else
+        get_feed(options[:url] || options[:query], 
+          options[:class].java_class)
+      end
+    rescue NativeException => e
+      return nil if e.message =~ /NotFound/
+      raise e
     end
   end
   
@@ -29,13 +34,18 @@ class Java::ComGoogleGdataClient::GoogleService
     raise "Entry Class is required" unless options[:class]
     options[:url] = url_for(options[:url]) if options[:url]
     
-    if options[:etag] or options[:modified_since]
-      get_entry(options[:url] || options[:query], 
-        options[:class].java_class, 
-        options[:etag] || options[:modified_since])
-    else
-      get_entry(options[:url] || options[:query], 
-        options[:class].java_class)
+    begin
+      if options[:etag] or options[:modified_since]
+        get_entry(options[:url] || options[:query], 
+          options[:class].java_class, 
+          options[:etag] || options[:modified_since])
+      else
+        get_entry(options[:url] || options[:query], 
+          options[:class].java_class)
+      end
+    rescue NativeException => e
+      return nil if e.message =~ /NotFound/
+      raise e
     end
   end
   
@@ -45,6 +55,14 @@ class Java::ComGoogleGdataClient::GoogleService
     options[:url] = url_for(options[:url]) if options[:url]
     
     insert(options[:url], options[:entry])
+  end
+  
+  def delete_entry(options={})
+    raise "Feed URL is required" unless options[:url]
+    raise "Entry is required" unless options[:entry]
+    options[:url] = url_for(options[:url]) if options[:url]
+    
+    delete(options[:url], options[:entry])
   end
   
   def create_batch(options={})
