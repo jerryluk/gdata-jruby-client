@@ -17,4 +17,8 @@ class Java::ComGoogleGdataData::BaseEntry
   def id
     get_id
   end
+  
+  def link
+    get_link(nil, nil)
+  end
 end
