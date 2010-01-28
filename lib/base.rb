@@ -13,4 +13,5 @@ module GData
   include_package 'com.google.gdata.util'
   include_package 'com.google.gdata.client'
   include_package 'com.google.gdata.client.authn.oauth'
+  include_package 'com.google.gdata.client.http'
 end

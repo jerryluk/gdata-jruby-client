@@ -33,6 +33,6 @@ credentials.attributes = {
   :token_secret => TOKEN_SECRET }
 service.oauth_credentials = credentials
 # Use AuthSubToken
-service.auth_sub_token = SESSION_TOKEN
+service.auth_sub_token = { :token => SESSION_TOKEN }
 feed = service.find_feed(:url => GData::ContactsService::DEFAULT_CONTACTS_URI)
 contacts = feed.entries

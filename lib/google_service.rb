@@ -5,8 +5,9 @@ class Java::ComGoogleGdataClient::GoogleService
     self.set_oauth_credentials(credientials, signer)
   end
   
-  def auth_sub_token=(token, private_key=nil)
-    self.set_auth_sub_token(token, private_key)
+  def auth_sub_token=(options)
+    options = {:private_key => nil}.merge(options)
+    self.set_auth_sub_token(options[:token], options[:private_key])
   end
   
   def find_feed(options={})
