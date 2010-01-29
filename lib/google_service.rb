@@ -59,11 +59,10 @@ class Java::ComGoogleGdataClient::GoogleService
   end
   
   def delete_entry(options={})
-    raise "Feed URL is required" unless options[:url]
-    raise "Entry is required" unless options[:entry]
+    raise "Entry URL is required" unless options[:url]
     options[:url] = url_for(options[:url]) if options[:url]
     
-    delete(options[:url], options[:entry])
+    delete(options[:url])
   end
   
   def create_batch(options={})
