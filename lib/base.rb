@@ -7,19 +7,18 @@ Dir.glob("#{File.dirname(__FILE__)}/gdata/java/lib/*.jar").each do |j|
 end
 
 module GData
-  class GeneralException < Exception; end
-  class AuthenticationException < Exception; end
-  class ServiceForbiddenException < Exception; end
-  class ResourceNotFoundException < Exception; end
+  class AuthenticationError < Exception; end
+  class ServiceForbidden < Exception; end
+  class ResourceNotFound < Exception; end
   
   def self.gdata_exception_for(e)
     case e.message
     when /AuthenticationException/
-      AuthenticationException.new(e.message)
+      AuthenticationError.new(e.message)
     when /ServiceForbiddenException/
-      ServiceForbiddenException.new(e.message)
+      ServiceForbidden.new(e.message)
     when /ResourceNotFoundException/
-      ResourceNotFoundException.new(e.message)
+      ResourceNotFound.new(e.message)
     else
       e
     end

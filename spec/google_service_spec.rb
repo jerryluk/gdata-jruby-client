@@ -7,6 +7,6 @@ include GoogleHelpers
 describe GData::GoogleService do
   it "should able to raise the right exception" do
     e = GData.gdata_exception_for(Exception.new("com.google.gdata.util.AuthenticationException: Token invalid - Invalid AuthSub token."))
-    e.should be_instance_of(GData::AuthenticationException)
+    e.should be_instance_of(GData::AuthenticationError)
   end
 end
