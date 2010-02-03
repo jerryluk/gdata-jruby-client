@@ -56,8 +56,9 @@ class Java::ComGoogleGdataClient::GoogleService
     raise "Feed URL is required" unless options[:url]
     raise "Entry is required" unless options[:entry]
     options[:url] = url_for(options[:url]) if options[:url]
-    
     insert(options[:url], options[:entry])
+  rescue NativeException => e
+    raise gdata_exception_for(e)
   end
   
   def delete_entry(options={})
@@ -73,6 +74,8 @@ class Java::ComGoogleGdataClient::GoogleService
     options[:url] = url_for(options[:url]) if options[:url]
     
     batch(options[:url], options[:feed])
+  rescue NativeException => e
+    raise gdata_exception_for(e)
   end
   
 end
