@@ -25,7 +25,7 @@ class Java::ComGoogleGdataClient::GoogleService
           options[:class].java_class)
       end
     rescue NativeException => e
-      e = gdata_exception_for(e)
+      e = GData.gdata_exception_for(e)
       return nil if e.is_? ResourceNotFoundException
       raise e
     end
@@ -46,7 +46,7 @@ class Java::ComGoogleGdataClient::GoogleService
           options[:class].java_class)
       end
     rescue NativeException => e
-      e = gdata_exception_for(e)
+      e = GData.gdata_exception_for(e)
       return nil if e.is_? ResourceNotFoundException
       raise e
     end
@@ -58,7 +58,7 @@ class Java::ComGoogleGdataClient::GoogleService
     options[:url] = url_for(options[:url]) if options[:url]
     insert(options[:url], options[:entry])
   rescue NativeException => e
-    raise gdata_exception_for(e)
+    raise GData.gdata_exception_for(e)
   end
   
   def delete_entry(options={})
@@ -75,7 +75,7 @@ class Java::ComGoogleGdataClient::GoogleService
     
     batch(options[:url], options[:feed])
   rescue NativeException => e
-    raise gdata_exception_for(e)
+    raise GData.gdata_exception_for(e)
   end
   
 end
