@@ -25,7 +25,8 @@ class Java::ComGoogleGdataClient::GoogleService
           options[:class].java_class)
       end
     rescue NativeException => e
-      return nil if e.message =~ /NotFound/
+      e = gdata_exception_for(e)
+      return nil if e.is_? ResourceNotFoundException
       raise e
     end
   end
@@ -45,7 +46,8 @@ class Java::ComGoogleGdataClient::GoogleService
           options[:class].java_class)
       end
     rescue NativeException => e
-      return nil if e.message =~ /NotFound/
+      e = gdata_exception_for(e)
+      return nil if e.is_? ResourceNotFoundException
       raise e
     end
   end
