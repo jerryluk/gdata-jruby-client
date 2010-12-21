@@ -12,7 +12,9 @@ class Time
   
   class << self
     def from_joda_time(gdatetime)
-      if defined? parse
+      if defined? Time.zone
+        Time.zone.parse(gdatetime.to_s)
+      elsif defined? parse
         self.parse(gdatetime.to_s)
       else
         res = ParseDate.parsedate(gdatetime.to_s)
